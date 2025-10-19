@@ -24,4 +24,6 @@ app.use((error, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
+ app.get("/healthz", (_req, res) => res.status(200).send("ok"));
+
 module.exports = app;
