@@ -1,11 +1,19 @@
+const { PORT = 5001 } = process.env;
 const app = require("./app");
-const PORT = process.env.PORT || 5000;
+const knex = require("./db/connection");
 
-if (process.env.NODE_ENV !== "production") {
-  const knex = require("./db/connection");
-  knex.migrate.latest().then(() => {
-    app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+const listener = () => console.log(`Listening on Port ${PORT}!`);
+
+knex.migrate
+  .latest()
+  .then((migrations) => {
+    console.log("migrations", migrations);
+    return knex.seed.run();
+  })
+  .then(() => {
+    app.listen(PORT, listener);
+  })
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
   });
-} else {
-  app.listen(PORT, () => console.log(`Listening on ${PORT}`));
-}
