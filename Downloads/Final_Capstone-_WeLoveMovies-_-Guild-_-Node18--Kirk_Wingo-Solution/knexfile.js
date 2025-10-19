@@ -1,35 +1,34 @@
 require("dotenv").config();
-
-const migrations = { directory: "src/db/migrations" };
-const seeds = { directory: "src/db/seeds" };
+const { DATABASE_URL, DATABASE_SSL } = process.env;
 
 module.exports = {
   development: {
     client: "pg",
-    connection: process.env.DATABASE_URL || "postgres://localhost/welovemovies",
-    migrations,
-    seeds,
+    connection: {
+      connectionString: DATABASE_URL || "postgres://localhost:5432/welovemovies_dev",
+      ssl: DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
+    },
+    migrations: { directory: "./src/db/migrations" },
+    seeds: { directory: "./src/db/seeds" },
   },
 
   test: {
     client: "sqlite3",
     connection: { filename: ":memory:" },
-    useNullAsDefault: true,          
-    migrations,
-    seeds,
-    pool: {
-      afterCreate: (conn, done) => conn.run("PRAGMA foreign_keys = ON", done),
-    },
+    useNullAsDefault: true,
+    migrations: { directory: "./src/db/migrations" },
+    seeds: { directory: "./src/db/seeds" },
   },
 
   production: {
     client: "pg",
     connection: {
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
+      connectionString: DATABASE_URL,
+      ssl: DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
     },
-    migrations,
-    seeds,
-    pool: { min: 0, max: 10 },
+    pool: { min: 2, max: 10 },
+    migrations: { directory: "./src/db/migrations" },
+    seeds: { directory: "./src/db/seeds" }
   },
 };
+
