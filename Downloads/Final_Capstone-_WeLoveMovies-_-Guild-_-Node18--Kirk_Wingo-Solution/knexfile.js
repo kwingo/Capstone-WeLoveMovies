@@ -1,13 +1,17 @@
 require("dotenv").config();
-const { DATABASE_URL, DATABASE_SSL } = process.env;
+
+const {
+  DATABASE_URL,
+  DATABASE_SSL,        
+  NODE_ENV,
+} = process.env;
 
 module.exports = {
   development: {
     client: "pg",
-    connection: {
-      connectionString: DATABASE_URL || "postgres://localhost:5432/welovemovies_dev",
-      ssl: DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
-    },
+    connection: DATABASE_URL || "postgres://localhost/welovemovies",
+    ssl: DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
+    pool: { min: 2, max: 10 },
     migrations: { directory: "./src/db/migrations" },
     seeds: { directory: "./src/db/seeds" },
   },
@@ -20,19 +24,13 @@ module.exports = {
     seeds: { directory: "./src/db/seeds" },
   },
 
-production: {
-  client: "pg",
-  connection: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  pool: { min: 2, max: 10 },
-  migrations: { directory: "src/db/migrations" },
-  seeds: { directory: "src/db/seeds" },
-}
-
-    },
+  production: {
+    client: "pg",
+    connection: DATABASE_URL,
+    ssl: DATABASE_SSL === "false" ? false : { rejectUnauthorized: false },
     pool: { min: 2, max: 10 },
     migrations: { directory: "./src/db/migrations" },
-    seeds: { directory: "./src/db/seeds" }
+    seeds: { directory: "./src/db/seeds" },
   },
 };
 
