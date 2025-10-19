@@ -1,19 +1,24 @@
-if (process.env.USER) require("dotenv").config();
-
 const express = require("express");
-const app = express();
+const cors = require("cors");
+
 const moviesRouter = require("./movies/movies.router");
 const theatersRouter = require("./theaters/theaters.router");
 const reviewsRouter = require("./reviews/reviews.router");
+const methodNotAllowed = require("./errors/methodNotAllowed");
 
-// TODO: Add your code here
+const app = express();
+
+app.use(cors());
 app.use(express.json());
 
+app.get("/healthz", (_req, res) => res.status(200).send("ok"));
+
+// Routes
 app.use("/movies", moviesRouter);
 app.use("/theaters", theatersRouter);
 app.use("/reviews", reviewsRouter);
 
-// Not-found handler
+// 404
 app.use((req, res, next) => {
   next({ status: 404, message: `Not found: ${req.originalUrl}` });
 });
@@ -23,7 +28,5 @@ app.use((error, req, res, next) => {
   const { status = 500, message = "Something went wrong!" } = error;
   res.status(status).json({ error: message });
 });
-
- app.get("/healthz", (_req, res) => res.status(200).send("ok"));
 
 module.exports = app;
