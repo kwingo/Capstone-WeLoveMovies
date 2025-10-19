@@ -16,9 +16,7 @@ exports.up = (knex) =>
 
     t.boolean("is_showing").defaultTo(false);
     t.timestamps(true, true);
-
     t.primary(["movie_id", "theater_id"]);
   });
 
 exports.down = (knex) => knex.schema.dropTableIfExists("movies_theaters");
-
